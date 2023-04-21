@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from ORMModels import Base
+from .ORMModels import Base
 
 
 engine = create_engine('sqlite:///db.db', echo=True)

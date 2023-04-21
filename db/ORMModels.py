@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, Time, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Time, ForeignKey, PrimaryKeyConstraint
 
 
 Base = declarative_base()
@@ -9,7 +9,7 @@ class UserORM:
     tg_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False) 
     rating = Column(Float, nullable=False)
-    from_time = Column(Time, nullable=False)
+    start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
 
@@ -26,12 +26,11 @@ class DriverORM(Base, UserORM):
 class BusStationORM(Base):
     __tablename__ = 'bus_stations'
 
-    name = Column(String, nullable=False)
-    station_id = Column(Integer, primary_key=True, autoincrement=True)
+    station_id = Column(Integer)
     person_tg_id = Column(Integer, ForeignKey('passengers.tg_id',
                                                ondelete='cascade',
                                                onupdate='cascade'),
                                     ForeignKey('drivers.tg_id',
                                                ondelete='cascade',
                                                onupdate='cascade'))
-
+    PrimaryKeyConstraint(station_id, person_tg_id)

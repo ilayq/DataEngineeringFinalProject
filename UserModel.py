@@ -25,4 +25,11 @@ if __name__ == '__main__':
         rating=1.2,
         places=1
     )
-    print(dr)
+    # print(dr)
+    # print(dr.dict())
+    # print(Driver.__fields__)
+
+    from db import DriverORM
+    d = DriverORM()
+    d.bus_stations = [1, 2, 3]
+    print(d.__dict__)
