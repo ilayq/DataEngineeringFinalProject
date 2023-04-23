@@ -10,26 +10,18 @@ from server.shemas import Driver, Passenger
 from typing import Union
 
 
-async def __get_stations_by_user_tg_id(tg_id: int) -> list[int]:
+async def get_stations_by_user_tg_id(tg_id: int) -> list[int]:
     q = select(BusStationORM.station_id).where(BusStationORM.person_tg_id == tg_id)
     with engine.connect() as db:
         for row in db.execute(q):
             yield row[0]
 
 
-# async def __get_driver_from_orm(driver: DriverORM, tg_id: int) -> Driver:
-#     stations = 
-
-
-# async def __get_passenger(tg_id: int) -> Passenger:
-#     ...
-
-
 async def get_user_data_handler(tg_id: int) -> Union[Driver, Passenger]:
     with Session(engine) as db:
         q = select(DriverORM).where(DriverORM.tg_id == tg_id)
         driver_response = db.execute(q).fetchone()
-    bus_stations = [_ async for _ in __get_stations_by_user_tg_id(tg_id)]
+    bus_stations = [_ async for _ in get_stations_by_user_tg_id(tg_id)]
     
     if driver_response:
         driver_response[0].bus_stations = bus_stations

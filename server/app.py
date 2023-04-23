@@ -1,7 +1,7 @@
 import uvicorn
 import fastapi
 
-from handlers import add_user_handler, get_user_data_handler
+from handlers import add_user_handler, get_user_data_handler, patch_user_handler
 from shemas import Driver, Passenger
 from typing import Union, List
 
@@ -9,17 +9,22 @@ from typing import Union, List
 app = fastapi.FastAPI()
 
 
-@app.post('/user')
-async def add_user(user: Union[Driver, Passenger]):
-    response = await add_user_handler(user)
+def make_response(response: bool) -> dict:
     if response:
         return {"msg": "success"}
     return {"msg": "failed"}
 
 
+@app.post('/user')
+async def add_user(user: Union[Driver, Passenger]) -> bool:
+    response = await add_user_handler(user)
+    return make_response(response)
+
+
 @app.patch('/user')
-async def patch_user(user: Union[Driver, Passenger]):
-    ...
+async def patch_user(user: Union[Driver, Passenger]) -> bool:
+    response = await patch_user_handler(user)
+    return make_response(response)
 
 
 @app.get('/user')
