@@ -13,7 +13,6 @@ class User(BaseModel):
     name: str
     start_time: time
     bus_station: int
-    rating: float
 
     class Config:
         # json_encoders = {
@@ -37,7 +36,6 @@ if __name__ == '__main__':
         start_time=time(hour=1, minute=2),
         end_time=time(hour=1, minute=3),
         bus_stations=1,
-        rating=1.2,
         places=1,
         car="asd 123"
     )

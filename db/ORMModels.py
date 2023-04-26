@@ -8,7 +8,6 @@ Base = declarative_base()
 class UserORM:
     tg_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False) 
-    rating = Column(Float, nullable=False)
     start_time = Column(Time, nullable=False)
     bus_station = Column(Integer, nullable=False)
 

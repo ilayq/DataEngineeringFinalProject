@@ -73,7 +73,7 @@ async def find_driver_for_passenger(passenger_tg_id: int) -> Driver:
 @check_driver_list
 @app.get('/add_driver_to_query')
 async def add_driver_to_active(driver_tg_id: int):
-    driver = get_user_data_handler(tg_id=driver_tg_id)
+    driver = await get_user_data_handler(tg_id=driver_tg_id)
     active_drivers.append(driver)
     return make_response(driver)
 

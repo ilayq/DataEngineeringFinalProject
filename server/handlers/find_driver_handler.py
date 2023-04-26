@@ -17,7 +17,7 @@ async def find_driver_handler(passenger_tg_id: int, active_drivers: List[Driver]
     for driver in active_drivers:
         driver_time = driver.start_time
         driver_timedelta = datetime.timedelta(hours=driver_time.hour, minutes=driver_time.minute)
-        if not (set(passenger.bus_stations) & set(driver.bus_stations)):
+        if passenger.bus_station != driver.bus_station:
             continue
         if driver_timedelta > passenger_timedelta:
             if (driver_timedelta - passenger_timedelta).seconds // 60 > 5:
