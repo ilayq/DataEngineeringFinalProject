@@ -12,7 +12,6 @@ choice - driver/passenger
 busstation - [1-5]
 start time
 ratingcar
-
 '''
 #keyboardsstart
 kbstart = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -62,8 +61,8 @@ station = {
 @bot.message_handler(commands=['start'])
 def start(message):
     d = dict()
-    bot.send_message(message.chat.id,message)
-    d["login"] = '@' + str(message.chat.username)
+    d["id"] = message.chat.id
+    bot.send_message(d["id"],message)
     sent = bot.send_message(message.chat.id,'Напишите свое имя и фамилию',reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(sent,review,d)
 
