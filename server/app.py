@@ -57,7 +57,10 @@ async def patch_user(user: Union[Driver, Passenger]):
 @check_driver_list
 @app.get('/user')
 async def get_user_data(tg_id: int) -> Union[Driver, Passenger]:
-    return await get_user_data_handler(tg_id=tg_id)
+    r = await get_user_data_handler(tg_id=tg_id)
+    if not r:
+        return {"msg": "fail"}
+    return r
 
 
 @check_driver_list
