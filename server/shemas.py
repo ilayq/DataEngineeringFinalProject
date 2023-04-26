@@ -12,8 +12,7 @@ class User(BaseModel):
     tg_id: int
     name: str
     start_time: time
-    end_time: time
-    bus_stations: List[int]
+    bus_station: int
     rating: float
 
     class Config:
@@ -23,14 +22,10 @@ class User(BaseModel):
         orm_mode = True
         validate_assignment = True
 
-    @validator("end_time")
-    def validate_time(cls, v, values):
-        assert v > values["start_time"] 
-        return v
-
 
 class Driver(User):
     places: int
+    car: str
 
 class Passenger(User):
     pass
@@ -41,8 +36,9 @@ if __name__ == '__main__':
         name='asd',
         start_time=time(hour=1, minute=2),
         end_time=time(hour=1, minute=3),
-        bus_stations=[1,2,3],
+        bus_stations=1,
         rating=1.2,
-        places=1
+        places=1,
+        car="asd 123"
     )
     print(dr)

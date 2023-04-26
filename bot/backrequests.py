@@ -12,6 +12,7 @@ from typing import Union, Any
 base_url = "http://127.0.0.1:8000/"
 headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
 
+
 def add_user(user: Union[Driver, Passenger]) -> bool:
     response = requests.post(url=base_url + 'user', data=json.dumps(user.dict(), default=str))
     response = json.loads(response.text)
@@ -38,8 +39,9 @@ def add_driver_to_query(driver_tg_id: int) -> bool:
     return response["msg"] == "success"
 
 
-def find_driver_for_passenger(passenger_tg_id: int) -> Any[Driver, bool]:
+def find_driver_for_passenger(passenger_tg_id: int) -> Union[Driver, bool]:
     response = requests.get(url=base_url + "find_driver", params={"passenger_tg_id": passenger_tg_id})
+    print(response.text)
     response = json.loads(response.text)
     if "msg" in response:
         return False
@@ -47,15 +49,23 @@ def find_driver_for_passenger(passenger_tg_id: int) -> Any[Driver, bool]:
 
 
 if __name__ == "__main__":
-    import asyncio
-    from datetime import time
-
-    print(asyncio.run(get_user_from_db(2)))
 
     psg = Passenger(tg_id=5,
                     name="asd",
                     start_time="07:30",
-                    end_time="07:35",
-                    bus_stations=[1],
+                    bus_station=1,
                     rating=2)
-    print(asyncio.run(add_user(psg)))
+    drv = Driver(tg_id=1, 
+                 name="asd asd",
+                 start_time="07:35",
+                 bus_station=1,
+                 rating=5,
+                 places=4,
+                 car="213 asd")
+
+    # print(add_user(psg))
+    # print(add_user(drv))
+
+    # print(get_user_from_db(5))
+    print(add_driver_to_query(1))
+    print(find_driver_for_passenger(5))

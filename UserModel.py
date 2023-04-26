@@ -23,10 +23,11 @@ if __name__ == '__main__':
         end_time=time(hour=1, minute=2),
         bus_stations=[1,2,3],
         rating=1.2,
-        places=1
+        places=1,
+        asd=234
     )
-    # print(dr)
-    # print(dr.dict())
+    print(dr)
+    print(dr.dict())
     # print(Driver.__fields__)
 
     from db import DriverORM

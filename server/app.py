@@ -63,7 +63,7 @@ async def get_user_data(tg_id: int) -> Union[Driver, Passenger]:
 @check_driver_list
 @app.get('/find_driver')
 async def find_driver_for_passenger(passenger_tg_id: int) -> Driver:
-    driver = await find_driver_handler(passenger_tg_id=passenger_tg_id)
+    driver = await find_driver_handler(passenger_tg_id, active_drivers)
     if driver:
         return driver
     else:

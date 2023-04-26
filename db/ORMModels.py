@@ -9,9 +9,8 @@ class UserORM:
     tg_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False) 
     rating = Column(Float, nullable=False)
-    #TODO DELETE end_time
     start_time = Column(Time, nullable=False)
-    end_time = Column(Time, nullable=False)
+    bus_station = Column(Integer, nullable=False)
 
 
 class PassengerORM(Base, UserORM):
@@ -22,17 +21,4 @@ class DriverORM(Base, UserORM):
     __tablename__ = 'drivers'
 
     places = Column(Integer, nullable=False)
-    #TODO ADD FIELD CAR
-
-
-class BusStationORM(Base):
-    __tablename__ = 'bus_stations'
-
-    station_id = Column(Integer)
-    person_tg_id = Column(Integer, ForeignKey('passengers.tg_id',
-                                               ondelete='cascade',
-                                               onupdate='cascade'),
-                                    ForeignKey('drivers.tg_id',
-                                               ondelete='cascade',
-                                               onupdate='cascade'))
-    PrimaryKeyConstraint(station_id, person_tg_id)
+    car = Column(String, nullable=False)
