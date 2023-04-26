@@ -19,10 +19,11 @@ def add_user(user: Union[Driver, Passenger]) -> bool:
     return response["msg"] == "success"
 
 
-def get_user_from_db(tg_id: int) -> Union[Driver, Passenger]:
+def get_user_from_db(tg_id: int) -> Union[Driver, Passenger, bool]:
     response = requests.get(url=base_url + "user", params={"tg_id": tg_id})
-    print(response.text)
     response = json.loads(response.text)
+    if "msg" in response:
+        return False
     if "places" in response:
         return Driver(**response)
     return Passenger(**response)
