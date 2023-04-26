@@ -4,12 +4,6 @@ import telebot
 from telebot import types
 bot = telebot.TeleBot('5915561601:AAGYQkRwXRmyNujp8wFlU3luhxYkBVWL0Fg')
 
-ready = "nonactive"
-username =""
-choice = ""
-mainstation = 0
-car = ''
-starttime = datetime.time(hour =0,minute = 00)
 
 '''
 ready - active/nonactive
@@ -17,8 +11,8 @@ username
 choice - driver/passenger
 busstation - [1-5]
 start time
-rating
-car
+ratingcar
+
 '''
 #keyboardsstart
 kbstart = types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -47,7 +41,7 @@ btndrive1 = types.KeyboardButton("Изменить данные")
 btndrive2 = types.KeyboardButton("Найти попутчиков")
 kbdrive.add(btndrive1,btndrive2)
 
-#kayboardstop
+#keyboardstop
 kbstop = types.ReplyKeyboardMarkup(resize_keyboard=True)
 btnstop = types.KeyboardButton("Остановить поиск")
 kbstop.add(btnstop)
@@ -67,67 +61,64 @@ station = {
 #start
 @bot.message_handler(commands=['start'])
 def start(message):
-    global ready,username,choice,mainstation,car,starttime
-    ready = "nonactive"
-    username = ""
-    choice = ""
-    mainstation = 0
-    car = ''
-    starttime = datetime.time(hour=0, minute=00)
+    d = dict()
+    bot.send_message(message.chat.id,message)
+    d["login"] = '@' + str(message.chat.username)
     sent = bot.send_message(message.chat.id,'Напишите свое имя и фамилию',reply_markup=types.ReplyKeyboardRemove())
-    bot.register_next_step_handler(sent,review)
+    bot.register_next_step_handler(sent,review,d)
 
 
 #create name
-def review(message):
-    global username
-    username = message.text
-    review2(message)
+def review(message,d:dict):
+    d["username"] = message.text
+    review2(message,d)
 
 #check who is
-def review2(message):
+def review2(message,d:dict):
     kb = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton(text='Водитель')
     btn2 = types.KeyboardButton(text='Пассажир')
     kb.add(btn1,btn2)
     a=bot.send_message(message.chat.id, "Выберите категорию", reply_markup=kb)
-    bot.register_next_step_handler(a,driverorpass)
+    bot.register_next_step_handler(a,driverorpass,d)
 
-def driverorpass(message):
-    global choice
+def driverorpass(message,d:dict):
     if message.text == "Водитель":
-        choice = "Driver"
-        a = bot.send_message(message.chat.id,'Хорошо,тепрь укажите марку и номер вашей машины. Пример - honda 234',reply_markup=types.ReplyKeyboardRemove())
-        bot.register_next_step_handler(a, carnum)
+        d["choice"] = "Driver"
+        a = bot.send_message(message.chat.id,'Хорошо,тепрь укажите марку и номер вашей машины. ',reply_markup=types.ReplyKeyboardRemove())
+        bot.register_next_step_handler(a, carnum,d)
 
     elif message.text == "Пассажир":
-        choice = "Passenger"
+        d["choice"] = "Passenger"
         a = bot.send_message(message.chat.id,"Выберите остановку у которой вас забрать.",reply_markup=kbstat)
-        bot.register_next_step_handler(a,busstation)
-def carnum(message):
-    global car
-    car = message.text
+        bot.register_next_step_handler(a,busstation,d)
+def carnum(message,d:dict):
+    d["car"] = message.text
+    a = bot.send_message(message.chat.id, "Напишите кол-во свободных мест в машине.", reply_markup=types.ReplyKeyboardRemove())
+    bot.register_next_step_handler(a,places,d)
+def places(message,d:dict):
+    d["places"] = int(message.text)
     a = bot.send_message(message.chat.id, "Выберите остановку от которой будете подвзвоить людей.", reply_markup=kbstat)
-    bot.register_next_step_handler(a,busstation)
+    bot.register_next_step_handler(a, busstation, d)
 
-def busstation(message):
-    global mainstation
-    mainstation = station[message.text]
+
+def busstation(message,d:dict):
+    d["mainstation"] = station[message.text]
     a = bot.send_message(message.chat.id,'Теперь напишите удобное для вас время отправления формата hh:mm', reply_markup=types.ReplyKeyboardRemove())
-    bot.register_next_step_handler(a,choosetime)
-def choosetime(message):
+    bot.register_next_step_handler(a,choosetime,d)
+def choosetime(message,d:dict):
     time = message.text.split(':')
     hour = time[0]
     minute = time[1]
-    starttime = datetime.time(hour = int(hour),minute = int(minute))
-    if choice == 'Passenger':
-        a = bot.send_message(message.chat.id, f'Имя: {username}\nКатегория: Пассажир\nВыбранная остановка: Остановка №{mainstation}\nВремя для выезда: {str(starttime)[:-3]}',reply_markup=kbpass)
+    d["starttime"] = datetime.time(hour = int(hour),minute = int(minute))
+    if d["choice"] == 'Passenger':
+        a = bot.send_message(message.chat.id, f'Имя: {d["username"]}\nКатегория: Пассажир\nВыбранная остановка: Остановка №{d["mainstation"]}\nВремя для выезда: {str(d["starttime"])[:-3]}',reply_markup=kbpass)
         #menupass(a)
     else:
-        a = bot.send_message(message.chat.id,f'Имя: {username}\nКатегория: Водитель, автомобиль: {car}\nВыбранная остановка: Остановка №{mainstation}\nВремя для выезда: {str(starttime)[:-3]}', reply_markup=kbdrive)
+        a = bot.send_message(message.chat.id,f'Имя: {d["username"]}\nКатегория: Водитель, автомобиль: {d["car"]}\nКол-во свободных мест: {d["places"]}\nВыбранная остановка: Остановка №{d["mainstation"]}\nВремя для выезда: {str(d["starttime"])[:-3]}', reply_markup=kbdrive)
 
 
-#Выбор водилы
+
 
 #Прием всех текстовых штук
 @bot.message_handler()
@@ -151,108 +142,5 @@ def menu(message):
         #ебануть запрос
         a = bot.send_message(message.chat.id,"Идет поиск...",reply_markup=kbstop)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-#функция сплита и вывода имени
-def printFio():
-    @bot.message_handler()
-    def FirstAndLastName(message):
-        name, lastname = message.text.split(' ')[0], message.text.split(' ')[1]
-        bot.send_message(message.chat.id, f'Привет {name} {lastname}', parse_mode='html')
-        bot.send_message(message.chat.id,'Выбери кто ты')
-        bot.register_next_step_handler_by_chat_id(ChooseWho(), message)
-
-#choose who is
-def ChooseWho():
-    @bot.message_handler()
-    def CW():
-        markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-        website = types.KeyboardButton('Водила')
-        start = types.KeyboardButton('Пасажир')
-        markup.add(website, start)
-'''
-
-
-#start
-
-
-
-
-
-
-
-
-#choose who is are
-
-
-
-
-
-
-
-
-
-
-#button
-
-
-
-
-
-'''
-@bot.message_handler()
-def get_user_text(message):
-    if message.text == "Hello":
-        bot.send_message(message.chat.id, " и тебе привет", parse_mode='html')
-    elif message.text =="id":
-        bot.send_message(message.chat.id, f"твой id: {message.from_user.id}", parse_mode='html')
-    elif message.text == "photo":
-        bot.send_photo(message.chat.id, )
-
-    else:
-        bot.send_message(message.chat.id, "Я тебя не понял", parse_mode='html')
-'''
-#button norm
-'''
-@bot.message_handler(commands=['button'])
-def websites(message):
-    markup = types.ReplyKeyboardMarkup(resize_keyboard= True, row_width=1)
-    website = types.KeyboardButton('Веб сайт')
-    start = types.KeyboardButton('Start')
-
-    markup.add(website,start)
-    bot.send_message(message.chat.id,'Cool', reply_markup = markup)
-'''
 
 bot.polling(none_stop=True)
