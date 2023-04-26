@@ -9,6 +9,7 @@ class UserORM:
     tg_id = Column(Integer, primary_key=True, nullable=False)
     name = Column(String, nullable=False) 
     rating = Column(Float, nullable=False)
+    #TODO DELETE end_time
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
 
@@ -21,6 +22,7 @@ class DriverORM(Base, UserORM):
     __tablename__ = 'drivers'
 
     places = Column(Integer, nullable=False)
+    #TODO ADD FIELD CAR
 
 
 class BusStationORM(Base):

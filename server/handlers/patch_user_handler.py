@@ -8,7 +8,7 @@ from sqlalchemy import update, delete, and_
 from db import BusStationORM, engine, DriverORM, PassengerORM
 from server.shemas import Driver, Passenger
 from typing import Union
-from get_user_data_handler import get_stations_by_user_tg_id
+from .get_user_data_handler import get_stations_by_user_tg_id
 
 
 async def patch_user_handler(user: Union[Driver, Passenger]) -> bool:
