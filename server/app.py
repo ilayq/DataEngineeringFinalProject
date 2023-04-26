@@ -42,14 +42,14 @@ def make_response(response: bool) -> dict:
 
 @check_driver_list
 @app.post('/user')
-async def add_user(user: Union[Driver, Passenger]) -> bool:
+async def add_user(user: Union[Driver, Passenger]):
     response = await add_user_handler(user)
     return make_response(response)
 
 
 @check_driver_list
 @app.patch('/user')
-async def patch_user(user: Union[Driver, Passenger]) -> bool:
+async def patch_user(user: Union[Driver, Passenger]):
     response = await patch_user_handler(user)
     return make_response(response)
 
@@ -72,7 +72,7 @@ async def find_driver_for_passenger(passenger_tg_id: int) -> Driver:
 
 @check_driver_list
 @app.get('/add_driver_to_query')
-async def add_driver_to_active(driver_tg_id: int) -> dict:
+async def add_driver_to_active(driver_tg_id: int):
     driver = get_user_data_handler(tg_id=driver_tg_id)
     active_drivers.append(driver)
     return make_response(driver)
