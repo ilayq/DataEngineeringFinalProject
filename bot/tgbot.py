@@ -1,5 +1,6 @@
 import datetime
-
+from backrequests import *
+from server.shemas import Driver,Passenger
 import telebot
 from telebot import types
 bot = telebot.TeleBot('5915561601:AAGYQkRwXRmyNujp8wFlU3luhxYkBVWL0Fg')
@@ -61,15 +62,14 @@ station = {
 @bot.message_handler(commands=['start'])
 def start(message):
     d = dict()
-    d["id"] = message.chat.id
-    bot.send_message(d["id"],message)
+    d["tg_id"] = message.chat.id
     sent = bot.send_message(message.chat.id,'Напишите свое имя и фамилию',reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(sent,review,d)
 
 
 #create name
 def review(message,d:dict):
-    d["username"] = message.text
+    d["name"] = message.text
     review2(message,d)
 
 #check who is
@@ -102,39 +102,52 @@ def places(message,d:dict):
 
 
 def busstation(message,d:dict):
-    d["mainstation"] = station[message.text]
+    d["bus_station"] = station[message.text]
     a = bot.send_message(message.chat.id,'Теперь напишите удобное для вас время отправления формата hh:mm', reply_markup=types.ReplyKeyboardRemove())
     bot.register_next_step_handler(a,choosetime,d)
 def choosetime(message,d:dict):
     time = message.text.split(':')
     hour = time[0]
     minute = time[1]
-    d["starttime"] = datetime.time(hour = int(hour),minute = int(minute))
+    d["start_time"] = datetime.time(hour = int(hour), minute = int(minute))
     if d["choice"] == 'Passenger':
-        a = bot.send_message(message.chat.id, f'Имя: {d["username"]}\nКатегория: Пассажир\nВыбранная остановка: Остановка №{d["mainstation"]}\nВремя для выезда: {str(d["starttime"])[:-3]}',reply_markup=kbpass)
-        #menupass(a)
+        a = bot.send_message(message.chat.id, f'Имя: {d["name"]}\nКатегория: Пассажир\nВыбранная остановка: Остановка №{d["bus_station"]}\nВремя для выезда: {str(d["start_time"])[:-3]}',reply_markup=kbpass)
+        print(d)
+        user = Passenger(**d)
     else:
-        a = bot.send_message(message.chat.id,f'Имя: {d["username"]}\nКатегория: Водитель, автомобиль: {d["car"]}\nКол-во свободных мест: {d["places"]}\nВыбранная остановка: Остановка №{d["mainstation"]}\nВремя для выезда: {str(d["starttime"])[:-3]}', reply_markup=kbdrive)
-
+        a = bot.send_message(message.chat.id,f'Имя: {d["name"]}\nКатегория: Водитель, автомобиль: {d["car"]}\nКол-во свободных мест: {d["places"]}\nВыбранная остановка: Остановка №{d["bus_station"]}\nВремя для выезда: {str(d["start_time"])[:-3]}', reply_markup=kbdrive)
+        print(d)
+        user = Driver(**d)
+    if get_user_from_db(message.chat.id):
+        patch_user_from_db(user)
+    else:
+        add_user(user)
 
 
 
 #Прием всех текстовых штук
 @bot.message_handler()
 def menu(message):
-    global ready
-    global choice
+    user = get_user_from_db(message.chat.id)
+    print(user)
+    if hasattr(user,"places"):
+        choice = 'Driver'
+    else:
+        choice = 'Passenger'
     if message.text == "Изменить данные":
         start(message)
     elif message.text == "Найти машину":
-        ready = "active"
-        #ебануть запрос
-        a = bot.send_message(message.chat.id,'Идет поиск подходящего водителя...',reply_markup=kbstop)
+        driver = find_driver_for_passenger(message.chat.id)
+        bot.send_message(message.chat.id,'Идет поиск подходящего водителя...',reply_markup=kbstop)
+        if driver:
+            bot.send_message(message.chat.id,f'Водитель найден\n'
+                                             f'телеграм водителя @{bot.get_chat(driver.tg_id).username}')
     elif message.text == "Остановить поиск":
-        ready = "nonactive"
-        if choice == "Passenger":
+
+        if 1:
             a = bot.send_message(message.chat.id, "Поиск прекращен", reply_markup=kbpass)
-        else: a = bot.send_message(message.chat.id, "Поиск прекращен", reply_markup=kbdrive)
+        else:
+            a = bot.send_message(message.chat.id, "Поиск прекращен", reply_markup=kbdrive)
 
     elif message.text == "Найти попутчиков":
         ready = "active"

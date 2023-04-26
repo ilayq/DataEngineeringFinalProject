@@ -21,6 +21,7 @@ def add_user(user: Union[Driver, Passenger]) -> bool:
 
 def get_user_from_db(tg_id: int) -> Union[Driver, Passenger]:
     response = requests.get(url=base_url + "user", params={"tg_id": tg_id})
+    print(response.text)
     response = json.loads(response.text)
     if "places" in response:
         return Driver(**response)
