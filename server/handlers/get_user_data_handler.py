@@ -21,6 +21,6 @@ async def get_user_data_handler(tg_id: int) -> Union[Driver, Passenger, bool]:
     with Session(engine) as db:
         q = select(PassengerORM).where(PassengerORM.tg_id == tg_id)
         passenger_response = db.execute(q).fetchone()
-    if not passenger_response:
+    if not passenger_response[0]:
         return False
     return Passenger.from_orm(passenger_response[0])
