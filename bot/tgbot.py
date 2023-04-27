@@ -118,6 +118,7 @@ def choosetime(message,d:dict):
         a = bot.send_message(message.chat.id,f'Имя: {d["name"]}\nКатегория: Водитель, автомобиль: {d["car"]}\nКол-во свободных мест: {d["places"]}\nВыбранная остановка: Остановка №{d["bus_station"]}\nВремя для выезда: {str(d["start_time"])[:-3]}', reply_markup=kbdrive)
         print(d)
         user = Driver(**d)
+    print(f'\n\nadd user: {user}\n\n')
     if get_user_from_db(message.chat.id):
         patch_user_from_db(user)
     else:

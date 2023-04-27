@@ -44,8 +44,10 @@ if __name__ == '__main__':
         name='asd',
         start_time=time(hour=1, minute=2),
         end_time=time(hour=1, minute=3),
-        bus_stations=1,
+        bus_station=1,
         places=1,
         car="asd 123"
     )
-    print(dr)
+    a = dict()
+    a[dr] = 1
+    print(a[dr])

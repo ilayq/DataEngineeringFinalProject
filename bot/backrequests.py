@@ -43,7 +43,7 @@ def add_driver_to_query(driver_tg_id: int) -> bool:
 
 def find_driver_for_passenger(passenger_tg_id: int) -> Union[Driver, bool]:
     response = requests.get(url=base_url + "find_driver", params={"passenger_tg_id": passenger_tg_id})
-    print(response.text)
+    print(f'\n\n{response.text}\n\n')
     response = json.loads(response.text)
     if "msg" in response:
         return False

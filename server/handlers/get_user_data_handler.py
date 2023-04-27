@@ -14,7 +14,7 @@ async def get_user_data_handler(tg_id: int) -> Union[Driver, Passenger, bool]:
     with Session(engine) as db:
         q = select(DriverORM).where(DriverORM.tg_id == tg_id)
         driver_response = db.execute(q).fetchone()
-    
+    print(f'driver response: {driver_response}')
     if driver_response:
         return Driver.from_orm(driver_response[0])
     

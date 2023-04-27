@@ -22,10 +22,11 @@ async def find_driver_handler(passenger_tg_id: int, active_drivers: List[Driver]
         if passenger.bus_station != driver.bus_station:
             continue
         if driver_timedelta > passenger_timedelta:
-            if (driver_timedelta - passenger_timedelta).seconds // 60 > 5:
+            if (driver_timedelta - passenger_timedelta).seconds // 60 > 10:
                 continue
         else:
-            if (passenger_timedelta - driver_timedelta).seconds // 60 > 5:
+            if (passenger_timedelta - driver_timedelta).seconds // 60 > 10:
                 continue
+        active_drivers[driver] -= 1
         return driver
     return None
