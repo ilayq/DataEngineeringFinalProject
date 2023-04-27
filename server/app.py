@@ -11,27 +11,26 @@ from shemas import Driver, Passenger
 app = fastapi.FastAPI()
 
 
-active_drivers: List[Driver]
-active_drivers = []
+active_drivers: dict[Driver]
+active_drivers = dict()
 
 
-def check_driver_list(func):
-
-    def check_drivers(*args, **kwargs):
-        cur_time = datetime.datetime.now()
-        cur_timedelta = datetime.timedelta(hours=cur_time.hour, minutes=cur_time.minute)
-        pop_shift = 0
-        for idx in range(len(active_drivers)):
-            driver = active_drivers[idx - pop_shift]
-            driver_time = driver.start_time
-            driver_timedelta = datetime.timedelta(hours=driver_time.hour, minutes=driver_time.minute)
-            if cur_timedelta + datetime.timedelta(minutes=10) >= driver_timedelta:
-                active_drivers.pop(idx - pop_shift)
-                pop_shift += 1
-        print(active_drivers)
-        func(*args, **kwargs)
-    
-    return check_drivers
+def check_driver_list():
+    cur_time = datetime.datetime.now()
+    cur_timedelta = datetime.timedelta(hours=cur_time.hour, minutes=cur_time.minute)
+    keys = active_drivers.keys()
+    to_del = []
+    for driver in keys:
+        driver_time = driver.start_time
+        driver_timedelta = datetime.timedelta(hours=driver_time.hour, minutes=driver_time.minute)
+        if not (driver_timedelta - datetime.timedelta(minutes=10) <= cur_timedelta  <= driver_timedelta + datetime.timedelta(minutes=10)):
+            to_del.append(driver)
+        elif active_drivers[driver] == 0:
+            to_del.append(driver)
+    for key in to_del:
+        print(f'delete driver from queue:{key}')
+        del active_drivers[key]
+    print(active_drivers)    
 
 
 def make_response(response: bool) -> dict:
@@ -40,21 +39,18 @@ def make_response(response: bool) -> dict:
     return {"msg": "failed"}
 
 
-@check_driver_list
 @app.post('/user')
 async def add_user(user: Union[Driver, Passenger]):
     response = await add_user_handler(user)
     return make_response(response)
 
 
-@check_driver_list
 @app.patch('/user')
 async def patch_user(user: Union[Driver, Passenger]):
     response = await patch_user_handler(user)
     return make_response(response)
 
 
-@check_driver_list
 @app.get('/user')
 async def get_user_data(tg_id: int):
     r = await get_user_data_handler(tg_id=tg_id)
@@ -63,21 +59,23 @@ async def get_user_data(tg_id: int):
     return r
 
 
-@check_driver_list
 @app.get('/find_driver')
 async def find_driver_for_passenger(passenger_tg_id: int):
+    check_driver_list()
     driver = await find_driver_handler(passenger_tg_id, active_drivers)
+    print(f'\n\nDriver found: {driver}\n\n')
     if driver:
         return driver
     else:
         return {"msg": "unable to find driver", "status": "fail"}
 
 
-@check_driver_list
 @app.get('/add_driver_to_query')
 async def add_driver_to_active(driver_tg_id: int):
+    check_driver_list()
     driver = await get_user_data_handler(tg_id=driver_tg_id)
-    active_drivers.append(driver)
+    active_drivers[driver] = driver.places
+    print(f'\n\nadd driver to queue:{driver}')
     return make_response(driver)
 
 
