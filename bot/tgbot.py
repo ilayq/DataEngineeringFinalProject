@@ -3,7 +3,7 @@ from backrequests import *
 from server.shemas import Driver,Passenger
 import telebot
 from telebot import types
-bot = telebot.TeleBot('5915561601:AAGYQkRwXRmyNujp8wFlU3luhxYkBVWL0Fg')
+bot = telebot.TeleBot('YOUR API-KEY')
 
 
 '''
