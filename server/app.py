@@ -1,11 +1,15 @@
+import os, sys
+
+sys.path.append(rf"C:\Users\{os.getlogin()}\de_project")
+
 import uvicorn
 import fastapi
 
-from typing import Union, List
+from typing import Union
 import datetime
 
-from handlers import add_user_handler, get_user_data_handler, patch_user_handler, find_driver_handler
-from shemas import Driver, Passenger
+from server.handlers import add_user_handler, get_user_data_handler, patch_user_handler, find_driver_handler
+from server.shemas import Driver, Passenger
 
 
 app = fastapi.FastAPI()
