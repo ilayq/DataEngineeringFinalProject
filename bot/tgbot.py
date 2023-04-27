@@ -123,36 +123,24 @@ def choosetime(message,d:dict):
     else:
         add_user(user)
 
-
-
 #Прием всех текстовых штук
 @bot.message_handler()
 def menu(message):
     user = get_user_from_db(message.chat.id)
     print(user)
-    if hasattr(user,"places"):
-        choice = 'Driver'
-    else:
-        choice = 'Passenger'
+
     if message.text == "Изменить данные":
         start(message)
     elif message.text == "Найти машину":
         driver = find_driver_for_passenger(message.chat.id)
-        bot.send_message(message.chat.id,'Идет поиск подходящего водителя...',reply_markup=kbstop)
+        bot.send_message(message.chat.id,'Идет поиск подходящего водителя...',reply_markup=kbpass)
         if driver:
             bot.send_message(message.chat.id,f'Водитель найден\n'
-                                             f'телеграм водителя @{bot.get_chat(driver.tg_id).username}')
-    elif message.text == "Остановить поиск":
-
-        if 1:
-            a = bot.send_message(message.chat.id, "Поиск прекращен", reply_markup=kbpass)
-        else:
-            a = bot.send_message(message.chat.id, "Поиск прекращен", reply_markup=kbdrive)
-
+                                             f'телеграм водителя @{bot.get_chat(driver.tg_id).username}\n'
+                                             f'автомобиль {driver.car}')
+            bot.send_message(driver.tg_id,f"ваш новый пассажир: @{message.chat.username}",reply_markup=kbpass)
+        else: bot.send_message(message.chat.id,"Попробуйте в другой раз",reply_markup=kbpass)
     elif message.text == "Найти попутчиков":
-        ready = "active"
-        #ебануть запрос
-        a = bot.send_message(message.chat.id,"Идет поиск...",reply_markup=kbstop)
-
-
+        add_driver_to_query(user.tg_id)
+        bot.send_message(message.chat.id,"Ваше объявление размещено",reply_markup=kbdrive)
 bot.polling(none_stop=True)
