@@ -21,13 +21,22 @@ class User(BaseModel):
         orm_mode = True
         validate_assignment = True
 
+    def __hash__(self) -> int:
+        return hash((type(self),) + tuple(self.__dict__.values()))
+
 
 class Driver(User):
     places: int
     car: str
 
+    def __hash__(self) -> int:
+        return super().__hash__()
+
 class Passenger(User):
     pass
+
+    def __hash__(self) -> int:
+        return super().__hash__()
 
 if __name__ == '__main__':
     dr = Driver(

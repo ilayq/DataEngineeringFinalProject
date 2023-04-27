@@ -11,6 +11,9 @@ class User(BaseModel):
     bus_stations: List[int]
     rating: float
 
+    def __hash__(self) -> int:
+        return hash((type(self),) + tuple(self.__dict__.values()))
+
 
 class Driver(User):
     places: int

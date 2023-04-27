@@ -12,6 +12,8 @@ import datetime
 
 async def find_driver_handler(passenger_tg_id: int, active_drivers: List[Driver]) -> Optional[Driver]:
     passenger = await get_user_data_handler(tg_id=passenger_tg_id)
+    if not passenger:
+        return None
     passenger_time = passenger.start_time
     passenger_timedelta = datetime.timedelta(hours=passenger_time.hour, minutes=passenger_time.minute)
     for driver in active_drivers:
