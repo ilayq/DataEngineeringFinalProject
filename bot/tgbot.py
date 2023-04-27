@@ -138,7 +138,8 @@ def menu(message):
             bot.send_message(message.chat.id,f'Водитель найден\n'
                                              f'телеграм водителя @{bot.get_chat(driver.tg_id).username}\n'
                                              f'автомобиль {driver.car}', reply_markup=kbpass)
-            bot.send_message(driver.tg_id,f"ваш новый пассажир: @{message.chat.username}",reply_markup=kbpass)
+            bot.send_message(driver.tg_id,f"ваш новый пассажир: @{message.chat.username}\n"
+                                          f"Имя: {user.name}",reply_markup=kbpass)
         else: bot.send_message(message.chat.id,"Попробуйте в другой раз",reply_markup=kbpass)
     elif message.text == "Найти попутчиков":
         add_driver_to_query(user.tg_id)
